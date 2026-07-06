@@ -2,6 +2,8 @@
 
 const HENRIK_API_BASE = 'https://api.henrikdev.xyz';
 const HENRIK_API_KEY_STORAGE = 'HENRIK_API_KEY';
+const DEFAULT_COMPETITIVE_MATCH_LIMIT = 50;
+const MAX_COMPETITIVE_MATCH_LIMIT = 100;
 
 function parseRiotId(raw) {
     const parts = raw.trim().split('#');
@@ -59,13 +61,14 @@ function setResults() {
 
 async function fetchPlayerSummary(parsed, region) {
     try {
-        const response = await fetch('/api/player-summary', {
+        const response = await fetch(trackerApiUrl('/api/player-summary'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 name: parsed.name,
                 tag: parsed.tag,
-                region
+                region,
+                matchLimit: getCompetitiveMatchLimit()
             })
         });
         const data = await response.json().catch(() => ({}));
@@ -75,6 +78,21 @@ async function fetchPlayerSummary(parsed, region) {
     }
 
     return fetchHenrikPlayerSummary(parsed, region);
+}
+
+function trackerApiBase() {
+    return String(window.LINEDUP_API_BASE || localStorage.getItem('LINEDUP_API_BASE') || '').trim().replace(/\/+$/, '');
+}
+
+function trackerApiUrl(url) {
+    const base = trackerApiBase();
+    return base && String(url).startsWith('/api/') ? `${base}${url}` : url;
+}
+
+function getCompetitiveMatchLimit() {
+    const configured = Number(window.LINEDUP_MATCH_LIMIT || localStorage.getItem('LINEDUP_MATCH_LIMIT') || DEFAULT_COMPETITIVE_MATCH_LIMIT);
+    if (!Number.isFinite(configured)) return DEFAULT_COMPETITIVE_MATCH_LIMIT;
+    return Math.min(MAX_COMPETITIVE_MATCH_LIMIT, Math.max(10, Math.round(configured)));
 }
 
 function getHenrikApiKey() {
@@ -104,15 +122,17 @@ async function fetchHenrikPlayerSummary(parsed, region) {
     const safeName = encodeURIComponent(parsed.name);
     const safeTag = encodeURIComponent(parsed.tag);
     const safeRegion = encodeURIComponent(region);
-    const [mmr, matches] = await Promise.all([
+    const matchLimit = getCompetitiveMatchLimit();
+    const [mmr, matches, rankHistory] = await Promise.all([
         fetchHenrikJson(`/valorant/v2/mmr/${safeRegion}/${safeName}/${safeTag}`),
-        fetchHenrikJson(`/valorant/v3/matches/${safeRegion}/${safeName}/${safeTag}?mode=competitive&size=10`)
+        fetchHenrikJson(`/valorant/v3/matches/${safeRegion}/${safeName}/${safeTag}?mode=competitive&size=${matchLimit}`),
+        fetchHenrikJson(`/valorant/v1/mmr-history/${safeRegion}/${safeName}/${safeTag}`).catch(() => [])
     ]);
 
-    return normalizeHenrikSummary(parsed, mmr, Array.isArray(matches) ? matches : []);
+    return normalizeHenrikSummary(parsed, mmr, Array.isArray(matches) ? matches : [], Array.isArray(rankHistory) ? rankHistory : []);
 }
 
-function normalizeHenrikSummary(parsed, mmr, matches) {
+function normalizeHenrikSummary(parsed, mmr, matches, rankHistory = []) {
     const players = matches
         .map(match => findPlayerInMatch(match, parsed))
         .filter(Boolean);
@@ -151,11 +171,23 @@ function normalizeHenrikSummary(parsed, mmr, matches) {
             totalDeaths: totals.deaths,
             totalAssists: totals.assists,
             kd: totals.deaths ? (totals.kills / totals.deaths).toFixed(2) : totals.kills.toFixed(2),
+            rankHistory: normalizeRankHistory(rankHistory),
             agents: buildAgentStats(players, normalizedMatches),
             weapons: []
         },
         matches: normalizedMatches
     };
+}
+
+function normalizeRankHistory(history) {
+    return history
+        .map(entry => ({
+            rank: entry.currenttierpatched || entry.currenttier_patched || entry.patched_tier || entry.tier_patched || entry.rank || 'Unrated',
+            rr: entry.ranking_in_tier ?? entry.elo_change_to_last_game ?? null,
+            date: Number(entry.date_raw || entry.date || entry.updated_at || 0) * (Number(entry.date_raw || 0) < 10000000000 ? 1000 : 1)
+        }))
+        .filter(entry => entry.rank && entry.rank !== 'Unrated')
+        .slice(0, 8);
 }
 
 function findPlayerInMatch(match, parsed) {
@@ -239,7 +271,7 @@ async function searchPlayer() {
 
     try {
         const summary = await fetchPlayerSummary(parsed, region);
-        setLoading('Processando rank e partidas recentes...');
+        setLoading('Processando rank e historico competitivo...');
 
         renderProfile(summary.profile, summary.stats);
         renderRank(summary.stats);
@@ -296,7 +328,24 @@ function renderRank(stats) {
     <div style="font-size:0.72rem;color:var(--text-3);margin-top:4px;text-align:center;">
       Dados atuais via tracker externo
     </div>
+    ${renderRankHistory(stats.rankHistory || [])}
   `;
+}
+
+function renderRankHistory(history) {
+    if (!history.length) return '';
+    const rows = history.map(item => `
+        <div class="rank-history-item">
+            <span>${escapeHtml(item.rank)}</span>
+            <small>${item.rr == null ? 'RR indisponivel' : `${escapeHtml(item.rr)} RR`}</small>
+        </div>
+    `).join('');
+    return `
+        <div class="rank-history-list">
+            <div class="rank-history-title">Historico recente de rank</div>
+            ${rows}
+        </div>
+    `;
 }
 
 function renderGeneral(stats) {

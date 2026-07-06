@@ -625,3 +625,46 @@ select option {
         display: none;
     }
 }
+
+.rank-history-list {
+    width: 100%;
+    display: grid;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+}
+
+.rank-history-title {
+    color: var(--text-3);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.rank-history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 5px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.055);
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--text-2);
+    font-size: 0.72rem;
+}
+
+.rank-history-item span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rank-history-item small {
+    flex: 0 0 auto;
+    color: var(--red);
+    font-size: 0.68rem;
+}

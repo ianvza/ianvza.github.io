@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const fs = require('fs/promises');
 const http = require('http');
+const https = require('https');
 const path = require('path');
 let nodemailer = null;
 
@@ -454,7 +455,188 @@ async function handleCollection(req, res, url, collectionName) {
 
 async function handlePlayerSummary(req, res, url) {
   if (req.method !== 'POST' || url.pathname !== '/api/player-summary') return false;
-  return sendJson(res, 501, { error: 'Use o fallback do navegador para consultar a Henrik API.' });
+  const apiKey = String(process.env.HENRIK_API_KEY || '').trim();
+  if (!apiKey) return sendJson(res, 501, { error: 'Configure HENRIK_API_KEY no servidor.' });
+
+  const payload = await readBody(req);
+  const parsed = {
+    name: String(payload.name || '').trim(),
+    tag: String(payload.tag || '').trim()
+  };
+  const region = encodeURIComponent(String(payload.region || 'br').trim());
+  const name = encodeURIComponent(parsed.name);
+  const tag = encodeURIComponent(parsed.tag);
+  const matchLimit = normalizeMatchLimit(payload.matchLimit);
+
+  if (!parsed.name || !parsed.tag) return sendJson(res, 400, { error: 'Informe name e tag.' });
+
+  try {
+    const [mmr, matches, rankHistory] = await Promise.all([
+      henrikJson(`/valorant/v2/mmr/${region}/${name}/${tag}`, apiKey),
+      henrikJson(`/valorant/v3/matches/${region}/${name}/${tag}?mode=competitive&size=${matchLimit}`, apiKey),
+      henrikJson(`/valorant/v1/mmr-history/${region}/${name}/${tag}`, apiKey).catch(() => [])
+    ]);
+
+    return sendJson(res, 200, normalizePlayerSummary(parsed, mmr, Array.isArray(matches) ? matches : [], Array.isArray(rankHistory) ? rankHistory : []));
+  } catch (error) {
+    return sendJson(res, 502, { error: error.message || 'Erro ao consultar Henrik API.' });
+  }
+}
+
+function normalizeMatchLimit(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 50;
+  return Math.min(100, Math.max(10, Math.round(parsed)));
+}
+
+function henrikJson(pathname, apiKey) {
+  return new Promise((resolve, reject) => {
+    const request = https.request({
+      hostname: 'api.henrikdev.xyz',
+      path: pathname,
+      method: 'GET',
+      headers: {
+        Authorization: apiKey,
+        Accept: 'application/json'
+      }
+    }, response => {
+      const chunks = [];
+      response.on('data', chunk => chunks.push(chunk));
+      response.on('end', () => {
+        const raw = Buffer.concat(chunks).toString('utf8');
+        const payload = JSON.parse(raw || '{}');
+        if (response.statusCode >= 400 || payload.status >= 400) {
+          reject(new Error(payload.errors?.[0]?.message || payload.error || `Erro Henrik API ${response.statusCode}`));
+          return;
+        }
+        resolve(payload.data ?? payload);
+      });
+    });
+
+    request.on('error', reject);
+    request.end();
+  });
+}
+
+function normalizePlayerSummary(parsed, mmr, matches, rankHistory) {
+  const players = matches
+    .map(match => findMatchPlayer(match, parsed))
+    .filter(Boolean);
+  const normalizedMatches = matches.map(match => normalizeServerMatch(match, parsed)).filter(Boolean);
+  const firstPlayer = players[0] || {};
+  const totals = players.reduce((acc, player) => {
+    const stats = player.stats || {};
+    acc.kills += Number(stats.kills || 0);
+    acc.deaths += Number(stats.deaths || 0);
+    acc.assists += Number(stats.assists || 0);
+    return acc;
+  }, { kills: 0, deaths: 0, assists: 0 });
+  const currentData = mmr.current_data || {};
+  const highestRank = mmr.highest_rank || {};
+  const wins = normalizedMatches.filter(match => match.result === 'win').length;
+
+  return {
+    profile: {
+      name: mmr.name || parsed.name,
+      tag: mmr.tag || parsed.tag,
+      level: firstPlayer.level || null,
+      card: firstPlayer.assets?.card?.small || firstPlayer.assets?.card?.large || ''
+    },
+    stats: {
+      rank: currentData.currenttier_patched || 'Unrated',
+      rr: currentData.ranking_in_tier ?? null,
+      rankIcon: currentData.images?.large || currentData.images?.small || '',
+      rankColor: '#FF4655',
+      peakRank: highestRank.patched_tier || highestRank.tier || currentData.currenttier_patched || 'N/A',
+      totalGames: normalizedMatches.length,
+      wins,
+      winrate: normalizedMatches.length ? Math.round((wins / normalizedMatches.length) * 100) : 0,
+      totalKills: totals.kills,
+      totalDeaths: totals.deaths,
+      totalAssists: totals.assists,
+      kd: totals.deaths ? (totals.kills / totals.deaths).toFixed(2) : totals.kills.toFixed(2),
+      rankHistory: normalizeServerRankHistory(rankHistory),
+      agents: buildServerAgentStats(players, normalizedMatches),
+      weapons: []
+    },
+    matches: normalizedMatches
+  };
+}
+
+function findMatchPlayer(match, parsed) {
+  const allPlayers = match?.players?.all_players || [];
+  return allPlayers.find(player => (
+    String(player.name || '').toLowerCase() === parsed.name.toLowerCase()
+    && String(player.tag || '').toLowerCase() === parsed.tag.toLowerCase()
+  ));
+}
+
+function normalizeServerMatch(match, parsed) {
+  const player = findMatchPlayer(match, parsed);
+  if (!player) return null;
+  const teams = match.teams || {};
+  const teamKey = String(player.team || '').toLowerCase();
+  const playerTeam = teams[teamKey] || {};
+  const enemyTeam = teams[teamKey === 'red' ? 'blue' : 'red'] || {};
+  const stats = player.stats || {};
+
+  return {
+    map: match.metadata?.map || 'Mapa',
+    mode: match.metadata?.mode || match.metadata?.queue || 'Competitive',
+    agent: player.character || 'Agente',
+    agentIcon: player.assets?.agent?.small || player.assets?.agent?.full || '',
+    result: Boolean(playerTeam.has_won ?? playerTeam.won) ? 'win' : 'loss',
+    resultLabel: Boolean(playerTeam.has_won ?? playerTeam.won) ? 'Vitoria' : 'Derrota',
+    score: {
+      us: playerTeam.rounds_won ?? playerTeam.rounds_won_display ?? 0,
+      them: enemyTeam.rounds_won ?? enemyTeam.rounds_won_display ?? 0
+    },
+    kda: {
+      kills: Number(stats.kills || 0),
+      deaths: Number(stats.deaths || 0),
+      assists: Number(stats.assists || 0)
+    },
+    rank: player.currenttier_patched || 'Unrated',
+    startedAt: Number(match.metadata?.game_start || 0) * 1000
+  };
+}
+
+function normalizeServerRankHistory(history) {
+  return history
+    .map(entry => ({
+      rank: entry.currenttierpatched || entry.currenttier_patched || entry.patched_tier || entry.tier_patched || entry.rank || 'Unrated',
+      rr: entry.ranking_in_tier ?? entry.elo_change_to_last_game ?? null
+    }))
+    .filter(entry => entry.rank && entry.rank !== 'Unrated')
+    .slice(0, 8);
+}
+
+function buildServerAgentStats(players, matches) {
+  const byAgent = new Map();
+  players.forEach((player, index) => {
+    const name = player.character || 'Agente';
+    const current = byAgent.get(name) || {
+      name,
+      icon: player.assets?.agent?.small || player.assets?.agent?.full || '',
+      games: 0,
+      wins: 0,
+      kills: 0,
+      deaths: 0
+    };
+    current.games += 1;
+    current.wins += matches[index]?.result === 'win' ? 1 : 0;
+    current.kills += Number(player.stats?.kills || 0);
+    current.deaths += Number(player.stats?.deaths || 0);
+    byAgent.set(name, current);
+  });
+
+  return [...byAgent.values()]
+    .map(agent => ({
+      ...agent,
+      kd: agent.deaths ? (agent.kills / agent.deaths).toFixed(2) : agent.kills.toFixed(2),
+      winrate: agent.games ? Math.round((agent.wins / agent.games) * 100) : 0
+    }))
+    .sort((a, b) => b.games - a.games);
 }
 
 async function serveStatic(req, res, url) {
