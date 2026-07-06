@@ -1,3 +1,42 @@
+.lineups-bg-page {
+    position: relative;
+    background: #080a0f;
+}
+
+.lineups-bg-page::before {
+    content: '';
+    position: fixed;
+    inset: 58px 0 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.026) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.026) 1px, transparent 1px),
+        radial-gradient(circle at 50% 0%, rgba(255, 70, 85, 0.13), transparent 34%);
+    background-size: 48px 48px, 48px 48px, 100% 100%;
+    -webkit-mask-image: linear-gradient(180deg, #000, rgba(0, 0, 0, 0.78) 58%, transparent);
+    mask-image: linear-gradient(180deg, #000, rgba(0, 0, 0, 0.78) 58%, transparent);
+}
+
+.lineups-bg-page::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        linear-gradient(180deg, rgba(8, 10, 15, 0.72) 0%, rgba(8, 10, 15, 0.84) 48%, rgba(8, 10, 15, 0.95) 100%),
+        linear-gradient(90deg, rgba(255, 70, 85, 0.18), transparent 34%, rgba(52, 180, 202, 0.12)),
+        url('../img/backgrounds/lineupbackground.png') center center / cover no-repeat;
+    transform: scale(1.2);
+    transform-origin: center;
+}
+
+.lineups-bg-page .page {
+    position: relative;
+    z-index: 2;
+}
+
 .lineups-page {
     padding-top: 58px;
     height: 100vh;
@@ -12,7 +51,7 @@
     background:
         linear-gradient(135deg, rgba(255, 70, 85, 0.09), transparent 28%),
         radial-gradient(circle at 92% 14%, rgba(255, 70, 85, 0.16), transparent 24%),
-        var(--bg);
+        rgba(14, 15, 19, 0.72);
 }
 
 .lineups-auth-required {
@@ -24,8 +63,7 @@
     overflow: hidden;
     background:
         linear-gradient(90deg, rgba(9, 11, 16, 0.92), rgba(9, 11, 16, 0.42) 48%, rgba(9, 11, 16, 0.9)),
-        linear-gradient(180deg, rgba(9, 11, 16, 0.38), rgba(9, 11, 16, 0.9)),
-        url('../img/maps/ascent.png') center / cover no-repeat;
+        linear-gradient(180deg, rgba(9, 11, 16, 0.38), rgba(9, 11, 16, 0.9));
 }
 
 .lineups-auth-required::before {
