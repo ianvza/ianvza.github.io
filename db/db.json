@@ -1,0 +1,360 @@
+{
+  "crosshairs": [
+    {
+      "id": 1,
+      "name": "Small Dot",
+      "code": "0;P;d;1;f;0;0t;4;0l;1;0o;0;0a;1;0f;0;1b;0",
+      "description": "VCRDB #85 - 7.341.440 copias",
+      "category": "Community",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 85,
+      "copied": 7341440
+    },
+    {
+      "id": 2,
+      "name": "TenZ",
+      "code": "0;s;1;P;c;5;h;0;m;1;0l;4;0o;2;0a;1;0f;0;1b;0;S;c;4;o;1",
+      "description": "VCRDB #67 - 6.889.276 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 67,
+      "copied": 6889276
+    },
+    {
+      "id": 3,
+      "name": "yay",
+      "code": "0;P;h;0;f;0;0l;4;0o;0;0a;1;0f;0;1b;0",
+      "description": "VCRDB #66 - 5.626.240 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 66,
+      "copied": 5626240
+    },
+    {
+      "id": 4,
+      "name": "Sacy",
+      "code": "0;P;h;0;f;0;0t;1;0l;4;0o;1;0a;1;0f;0;1t;3;1o;2;1a;1;1m;0;1f;0",
+      "description": "VCRDB #95 - 2.913.276 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 95,
+      "copied": 2913276
+    },
+    {
+      "id": 5,
+      "name": "LESS",
+      "code": "0;P;o;0;f;0;0t;1;0l;2;0o;0;0a;1;0f;0;1b;0",
+      "description": "VCRDB #92 - 2.252.019 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 92,
+      "copied": 2252019
+    },
+    {
+      "id": 6,
+      "name": "ScreaM",
+      "code": "0;P;c;5;o;0.286;d;1;f;0;0t;0;0l;0;0o;0;0a;1;0f;0;1b;0",
+      "description": "VCRDB #78 - 1.998.710 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 78,
+      "copied": 1998710
+    },
+    {
+      "id": 7,
+      "name": "Dep",
+      "code": "0;s;1;P;o;0.1;f;0;s;0;0t;1;0l;2;0o;1;0a;1;0f;0;1b;0",
+      "description": "VCRDB #103 - 1.975.135 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 103,
+      "copied": 1975135
+    },
+    {
+      "id": 8,
+      "name": "Aspas",
+      "code": "0;P;c;5;o;1;d;1;z;3;f;0;0b;0;1b;0",
+      "description": "VCRDB #91 - 1.828.469 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 91,
+      "copied": 1828469
+    },
+    {
+      "id": 9,
+      "name": "f0rsakeN",
+      "code": "0;P;o;1;f;0;0t;1;0l;1;0o;4;0a;1;0f;0;1t;1;1l;1;1o;3;1a;0;1m;0;1f;0",
+      "description": "VCRDB #107 - 1.808.226 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 107,
+      "copied": 1808226
+    },
+    {
+      "id": 10,
+      "name": "Hollow Circle",
+      "code": "0;P;h;0;f;0;0t;4;0l;1;0o;2;0a;1;0f;0;1b;0",
+      "description": "VCRDB #84 - 1.674.789 copias",
+      "category": "Community",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 84,
+      "copied": 1674789
+    },
+    {
+      "id": 11,
+      "name": "Tarik",
+      "code": "0;P;o;1;d;1;0b;0;1b;0",
+      "description": "VCRDB #463 - 1.650.255 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 463,
+      "copied": 1650255
+    },
+    {
+      "id": 12,
+      "name": "zekken",
+      "code": "0;P;h;0;f;0;0t;1;0l;3;0o;1;0a;1;0f;0;1b;0",
+      "description": "VCRDB #430 - 1.413.082 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 430,
+      "copied": 1413082
+    },
+    {
+      "id": 13,
+      "name": "Diamond",
+      "code": "0;P;c;5;h;0;f;0;0t;1;0l;3;0o;0;0a;1;0f;0;1t;3;1o;0;1a;1;1m;0;1f;0",
+      "description": "VCRDB #40 - 1.383.645 copias",
+      "category": "Community",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 40,
+      "copied": 1383645
+    },
+    {
+      "id": 14,
+      "name": "Windmill",
+      "code": "0;P;c;1;t;6;o;1;d;1;z;6;a;0;f;0;m;1;0t;10;0l;20;0o;20;0a;1;0m;1;0e;0.1;1t;10;1l;10;1o;40;1a;1;1m;0",
+      "description": "VCRDB #7 - 1.367.362 copias",
+      "category": "Community",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 7,
+      "copied": 1367362
+    },
+    {
+      "id": 15,
+      "name": "Cryo",
+      "code": "0;P;c;5;h;0;f;0;0l;3;0o;2;0a;1;0f;0;1b;0",
+      "description": "VCRDB #74 - 1.322.585 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 74,
+      "copied": 1322585
+    },
+    {
+      "id": 16,
+      "name": "cNed",
+      "code": "0;P;h;0;f;0;0l;5;0o;0;0a;1;0f;0;1b;0",
+      "description": "VCRDB #72 - 1.318.154 copias",
+      "category": "Pro",
+      "source": "VCRDB",
+      "sourceUrl": "https://www.vcrdb.net/",
+      "sourceId": 72,
+      "copied": 1318154
+    },
+    {
+      "id": 17,
+      "name": "Boaster",
+      "code": "0;P;c;5;o;0.5;d;1;z;2;f;0;0t;1;0l;3;0o;2;0a;1;0f;0;1b;0",
+      "description": "Mira compacta inspirada em pro players",
+      "category": "Pro",
+      "source": "LinedUp",
+      "sourceId": 501,
+      "copied": 980000
+    },
+    {
+      "id": 18,
+      "name": "Demon1",
+      "code": "0;P;c;5;h;0;f;0;0l;2;0o;2;0a;1;0f;0;1b;0",
+      "description": "Linhas curtas para duelos precisos",
+      "category": "Pro",
+      "source": "LinedUp",
+      "sourceId": 502,
+      "copied": 940000
+    },
+    {
+      "id": 19,
+      "name": "Something",
+      "code": "0;P;c;1;o;0.7;d;1;z;2;f;0;0t;1;0l;4;0o;2;0a;1;0f;0;1b;0",
+      "description": "Verde com ponto central discreto",
+      "category": "Pro",
+      "source": "LinedUp",
+      "sourceId": 503,
+      "copied": 910000
+    },
+    {
+      "id": 20,
+      "name": "Jinggg",
+      "code": "0;P;c;6;h;0;f;0;0t;2;0l;3;0o;1;0a;1;0f;0;1b;0",
+      "description": "Crosshair magenta agressiva",
+      "category": "Pro",
+      "source": "LinedUp",
+      "sourceId": 504,
+      "copied": 870000
+    },
+    {
+      "id": 21,
+      "name": "Alfajer",
+      "code": "0;P;c;5;h;0;f;0;0t;1;0l;4;0o;1;0a;1;0f;0;1b;0",
+      "description": "Ciano fina para rifles",
+      "category": "Pro",
+      "source": "LinedUp",
+      "sourceId": 505,
+      "copied": 830000
+    },
+    {
+      "id": 22,
+      "name": "Mini Plus",
+      "code": "0;P;c;1;h;0;f;0;0t;1;0l;2;0o;2;0a;1;0f;0;1b;0",
+      "description": "Pequena e limpa para qualquer mapa",
+      "category": "Community",
+      "source": "LinedUp",
+      "sourceId": 506,
+      "copied": 780000
+    },
+    {
+      "id": 23,
+      "name": "Ice Cyan",
+      "code": "0;P;c;5;o;0.4;d;1;z;1;f;0;0t;1;0l;5;0o;2;0a;1;0f;0;1b;0",
+      "description": "Ciano com outline suave",
+      "category": "Community",
+      "source": "LinedUp",
+      "sourceId": 507,
+      "copied": 740000
+    },
+    {
+      "id": 24,
+      "name": "Red Dot",
+      "code": "0;P;c;7;h;0;d;1;z;2;f;0;0b;0;1b;0",
+      "description": "Ponto vermelho minimalista",
+      "category": "Community",
+      "source": "LinedUp",
+      "sourceId": 508,
+      "copied": 720000
+    },
+    {
+      "id": 25,
+      "name": "Classic Green",
+      "code": "0;P;c;1;h;0;f;0;0t;2;0l;4;0o;2;0a;1;0f;0;1b;0",
+      "description": "Padr?o verde cl?ssico",
+      "category": "Default",
+      "source": "LinedUp",
+      "sourceId": 509,
+      "copied": 690000
+    },
+    {
+      "id": 26,
+      "name": "Default White",
+      "code": "0;P;c;0;h;0;f;0;0t;2;0l;4;0o;2;0a;1;0f;0;1b;0",
+      "description": "Padr?o branco simples",
+      "category": "Default",
+      "source": "LinedUp",
+      "sourceId": 510,
+      "copied": 650000
+    },
+    {
+      "id": 27,
+      "name": "Thin Yellow",
+      "code": "0;P;c;4;h;0;f;0;0t;1;0l;5;0o;2;0a;1;0f;0;1b;0",
+      "description": "Amarela fina de alta visibilidade",
+      "category": "Community",
+      "source": "LinedUp",
+      "sourceId": 511,
+      "copied": 620000
+    },
+    {
+      "id": 28,
+      "name": "Boxy",
+      "code": "0;P;c;5;o;1;d;1;z;3;f;0;0t;3;0l;1;0o;1;0a;1;0f;0;1b;0",
+      "description": "Formato quadrado compacto",
+      "category": "Community",
+      "source": "LinedUp",
+      "sourceId": 512,
+      "copied": 590000
+    },
+    {
+      "id": 29,
+      "name": "Long Lines",
+      "code": "0;P;c;5;h;0;f;0;0t;1;0l;8;0o;3;0a;1;0f;0;1b;0",
+      "description": "Linhas longas para tracking",
+      "category": "Community",
+      "source": "LinedUp",
+      "sourceId": 513,
+      "copied": 560000
+    },
+    {
+      "id": 30,
+      "name": "No Gap",
+      "code": "0;P;c;1;h;0;f;0;0t;1;0l;4;0o;0;0a;1;0f;0;1b;0",
+      "description": "Mira fechada sem espa?amento",
+      "category": "Community",
+      "source": "LinedUp",
+      "sourceId": 514,
+      "copied": 520000
+    },
+    {
+      "id": 31,
+      "name": "Outer Ring",
+      "code": "0;P;c;5;h;0;f;0;0b;0;1t;1;1l;4;1o;2;1a;1;1m;0;1f;0",
+      "description": "Linhas externas discretas",
+      "category": "Community",
+      "source": "LinedUp",
+      "sourceId": 515,
+      "copied": 490000
+    },
+    {
+      "id": 32,
+      "name": "Micro Cross",
+      "code": "0;P;c;5;h;0;f;0;0t;1;0l;2;0o;1;0a;1;0f;0;1b;0",
+      "description": "Micro mira para precis?o",
+      "category": "Community",
+      "source": "LinedUp",
+      "sourceId": 516,
+      "copied": 460000
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "login": "user",
+      "email": "user@tantofaz.com",
+      "senha": "123",
+      "type": "normal",
+      "favoriteCrosshairIds": []
+    },
+    {
+      "id": 2,
+      "login": "admin",
+      "email": "admin@tantofaz.com",
+      "senha": "123",
+      "type": "admin",
+      "favoriteCrosshairIds": []
+    }
+  ],
+  "pendingUsers": [],
+  "lineups": []
+}

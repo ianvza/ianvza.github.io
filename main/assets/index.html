@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LinedUp — Home</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/home.css" />
+    <link rel="stylesheet" href="css/lineups.css" />
+</head>
+
+<body>
+
+    <!-- ── Navbar ──────────────────────────────────── -->
+    <nav class="navbar">
+        <a href="index.html" class="brand-link" data-route="home" aria-label="LinedUp Home">
+            <span class="brand-mark">LU</span>
+            <span>LinedUp</span>
+        </a>
+        <div class="navbar-links">
+            <a href="index.html" class="navbar-link active" id="nav-home" data-route="home">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
+                    <path d="M9 21V12h6v9" />
+                </svg>
+                Home
+            </a>
+            <div class="navbar-auth">
+                <span class="session-user" id="session-user-label"></span>
+                <button class="auth-btn" id="auth-menu-btn" type="button" data-auth-action="login">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                        <path d="M10 17l5-5-5-5" />
+                        <path d="M15 12H3" />
+                    </svg>
+                    Login
+                </button>
+                <button class="auth-btn" id="register-menu-btn" type="button" data-auth-action="register">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M19 8v6" />
+                        <path d="M22 11h-6" />
+                    </svg>
+                    Registrar
+                </button>
+            </div>
+            <a href="lineups.html" class="navbar-link" id="nav-lineups" data-route="lineups">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <line x1="12" y1="2" x2="12" y2="6" />
+                    <line x1="12" y1="18" x2="12" y2="22" />
+                    <line x1="2" y1="12" x2="6" y2="12" />
+                    <line x1="18" y1="12" x2="22" y2="12" />
+                </svg>
+                Lineups
+            </a>
+            <a href="index.html#favorites" class="navbar-link" id="nav-favorites" data-route="favorites" data-auth-only>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11.5 4.2l2.1 4.4 4.8.7-3.5 3.4.8 4.8-4.2-2.3-4.2 2.3.8-4.8-3.5-3.4 4.8-.7 2.1-4.4z" />
+                </svg>
+                Favoritas
+            </a>
+            <a href="users.html" class="navbar-link" id="nav-users" data-route="users" data-admin-only>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Usuários
+            </a>
+        </div>
+    </nav>
+
+    <!-- ── Page ───────────────────────────────────── -->
+    <main class="page">
+        <div class="home-container">
+
+            <!-- HERO -->
+            <header class="hero">
+                <p class="hero-eyebrow">Valorant Tracker</p>
+                <h1 class="hero-title">Lined<span class="accent">Up</span></h1>
+                <p class="hero-sub">Pesquise qualquer jogador pelo Riot ID e veja rank, stats, agentes, armas e
+                    histórico.</p>
+            </header>
+
+            <!-- ── SEARCH ──────────────────────────────── -->
+            <section class="search-section">
+                <div class="search-bar-wrap">
+                    <div class="search-input-group">
+                        <div class="search-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="11" cy="11" r="8" />
+                                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                            </svg>
+                        </div>
+                        <input type="text" id="riot-id-input" placeholder="Nome#TAG  (ex: Player#BR1)"
+                            autocomplete="off" />
+                        <div class="search-divider"></div>
+                        <select id="region-select">
+                            <option value="br">BR</option>
+                            <option value="na">NA</option>
+                            <option value="eu">EU</option>
+                            <option value="ap">AP</option>
+                            <option value="kr">KR</option>
+                            <option value="latam">LATAM</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary search-btn" id="search-btn" onclick="searchPlayer()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="11" cy="11" r="8" />
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        </svg>
+                        Pesquisar
+                    </button>
+                </div>
+            </section>
+
+            <!-- ── RESULTS ─────────────────────────────── -->
+            <section id="results-section" class="results-section" style="display:none">
+
+                <!-- Profile header -->
+                <div class="profile-header" id="profile-header"></div>
+
+                <!-- Stats row -->
+                <div class="stats-row">
+                    <!-- Rank card -->
+                    <div class="card rank-card" id="rank-card">
+                        <div class="section-label">Rank Atual</div>
+                        <div id="rank-content" class="rank-content"></div>
+                    </div>
+                    <!-- General stats -->
+                    <div class="card general-card" id="general-card">
+                        <div class="section-label">Estatísticas Gerais</div>
+                        <div id="general-content"></div>
+                    </div>
+                </div>
+
+                <!-- Agents -->
+                <div class="card" id="agents-card">
+                    <div class="section-label">Agentes Mais Jogados</div>
+                    <div id="agents-content" class="agents-grid"></div>
+                </div>
+
+                <!-- Weapons -->
+                <div class="card" id="weapons-card">
+                    <div class="section-label">Desempenho por Arma</div>
+                    <div id="weapons-content" class="weapons-list"></div>
+                </div>
+
+                <!-- Match history -->
+                <div class="card" id="matches-card">
+                    <div class="section-label">Histórico de Partidas</div>
+                    <div id="matches-content" class="matches-list"></div>
+                </div>
+
+            </section>
+
+            <!-- Loading / Error states -->
+            <div id="loading-state" style="display:none" class="state-box">
+                <div class="loader" style="width:32px;height:32px;margin:0 auto 16px;"></div>
+                <p id="loading-msg">Buscando dados...</p>
+            </div>
+            <div id="error-state" style="display:none" class="state-box">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FF4655" stroke-width="1.5">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <p id="error-msg" style="margin-top:10px;color:#FF4655"></p>
+            </div>
+
+            <!-- ── CROSSHAIRS ──────────────────────────── -->
+            <section class="crosshairs-section">
+                <div class="crosshairs-header">
+                    <div>
+                        <div class="section-label">Crosshairs</div>
+                        <h2 class="section-title">Miras da Comunidade</h2>
+                    </div>
+                    <button class="btn btn-ghost" onclick="openCrosshairModal()" data-admin-only hidden>
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                        </svg>
+                        Adicionar Mira
+                    </button>
+                </div>
+
+                <!-- Filter tabs -->
+                <div class="crosshair-filters" id="crosshair-filters">
+                    <button class="filter-btn active" onclick="filterCrosshairs('all', this)">Todas</button>
+                    <button class="filter-btn" onclick="filterCrosshairs('Pro', this)">Pro Players</button>
+                    <button class="filter-btn" onclick="filterCrosshairs('Community', this)">Comunidade</button>
+                    <button class="filter-btn" onclick="filterCrosshairs('Default', this)">Padrão</button>
+                    <button class="filter-btn" data-auth-only onclick="filterCrosshairs('favorites', this)">Favoritas</button>
+                </div>
+                <div class="crosshair-search">
+                    <input type="text" id="crosshair-search-input" placeholder="Pesquisar mira por nome ou descrição"
+                        oninput="searchCrosshairs(this.value)" />
+                </div>
+
+                <div id="crosshairs-grid" class="crosshairs-grid"></div>
+                <div id="crosshair-pagination" class="crosshair-pagination" hidden></div>
+            </section>
+
+        </div><!-- /home-container -->
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-student">
+                <img src="img/profile/ian-souza-maciel.png" alt="Foto de perfil de Ian Souza Maciel"
+                    class="footer-avatar" loading="lazy" />
+                <div>
+                    <div class="footer-student-name">Ian Souza Maciel</div>
+                    <div class="footer-student-course">Engenharia de Software</div>
+                    <div class="footer-student-class">Turma <a
+                            href="https://pucminas.instructure.com/courses/260009" target="_blank"
+                            rel="noopener noreferrer">405102</a></div>
+                </div>
+            </div>
+
+            <div class="footer-bio">
+                <div class="footer-bio-label">Sobre</div>
+                <p class="footer-bio-text">
+                    Estudante de Engenharia de Software apaixonado por Valorant e por construir ferramentas
+                    para a comunidade do jogo. O LinedUp nasceu como projeto acadêmico para unir tracker de
+                    stats, lineups de utilitários e uma biblioteca de crosshairs em um só lugar.
+                </p>
+            </div>
+
+            <div class="footer-socials">
+                <a class="footer-social-link" href="https://instagram.com/iansmaciel" target="_blank"
+                    rel="noopener noreferrer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" />
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                        <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" />
+                    </svg>
+                    @iansmaciel
+                </a>
+                <a class="footer-social-link" href="https://discord.com/users/fvmi" target="_blank"
+                    rel="noopener noreferrer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M20.3 5.3A17.4 17.4 0 0 0 16 4l-.2.5a13 13 0 0 1 3.7 1.9 14.9 14.9 0 0 0-11 0A13 13 0 0 1 12.2 4.5L12 4a17.4 17.4 0 0 0-4.3 1.3C5.7 8.6 5 12.2 5.3 15.7a14.4 14.4 0 0 0 4.4 2.3l.6-1a9.7 9.7 0 0 1-1.8-.9l.5-.4a12 12 0 0 0 10 0l.5.4a9.7 9.7 0 0 1-1.8.9l.6 1a14.4 14.4 0 0 0 4.4-2.3c.3-3.7-.5-7.3-2.4-10.4zM9.7 13.9c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5zm4.6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5z" />
+                    </svg>
+                    @fvmi
+                </a>
+                <a class="footer-social-link" href="https://github.com/ianvza" target="_blank"
+                    rel="noopener noreferrer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
+                    </svg>
+                    @ianvza
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            Projeto acadêmico — LinedUp © 2026. Todos os dados de crosshairs pertencem aos seus respectivos
+            criadores.
+        </div>
+    </footer>
+
+    <!-- ── ADD CROSSHAIR MODAL ─────────────────────── -->
+    <div id="crosshair-modal" class="modal-overlay" style="display:none" data-admin-only onclick="closeCrosshairModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3>Adicionar Crosshair</h3>
+                <button class="modal-close" onclick="closeCrosshairModal()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nome</label>
+                        <input type="text" id="cx-name" placeholder="Ex: meu setup" />
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <select id="cx-category">
+                            <option value="Community">Comunidade</option>
+                            <option value="Pro">Pro Player</option>
+                            <option value="Default">Padrão</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Código de importação</label>
+                    <input type="text" id="cx-code" placeholder="0;P;c;5;h;0;..." />
+                    <span class="form-hint">Cole o código copiado do Valorant (Settings → Crosshair → Copy Profile
+                        Code)</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Descrição (opcional)</label>
+                    <input type="text" id="cx-desc" placeholder="Ex: pequena e precisa para duelos" />
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Cor da mira</label>
+                        <div class="color-input-wrap">
+                            <input type="color" id="cx-color" value="#00FF00" />
+                            <input type="text" id="cx-color-text" placeholder="#00FF00" value="#00FF00"
+                                oninput="syncColor(this)" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Cor do outline</label>
+                        <div class="color-input-wrap">
+                            <input type="color" id="cx-outline" value="#000000" />
+                            <input type="text" id="cx-outline-text" placeholder="#000000" value="#000000"
+                                oninput="syncOutline(this)" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live preview -->
+                <div class="form-group">
+                    <label>Prévia</label>
+                    <div class="crosshair-preview-box" id="cx-preview">
+                        <canvas id="cx-canvas" width="160" height="160"></canvas>
+                    </div>
+                    <div class="preview-controls">
+                        <label class="toggle-row"><input type="checkbox" id="cx-dot" onchange="renderPreview()"> Dot
+                            central</label>
+                        <label class="toggle-row"><input type="checkbox" id="cx-inner" checked
+                                onchange="renderPreview()"> Linhas internas</label>
+                        <label class="toggle-row"><input type="checkbox" id="cx-outer" onchange="renderPreview()">
+                            Linhas externas</label>
+                    </div>
+                    <div class="form-row" style="margin-top:10px">
+                        <div class="form-group">
+                            <label>Comprimento interno</label>
+                            <input type="range" id="cx-inner-len" min="1" max="20" value="4"
+                                oninput="renderPreview(); document.getElementById('cx-inner-len-val').textContent=this.value" />
+                            <span class="form-hint" id="cx-inner-len-val">4</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Espaçamento</label>
+                            <input type="range" id="cx-gap" min="0" max="16" value="2"
+                                oninput="renderPreview(); document.getElementById('cx-gap-val').textContent=this.value" />
+                            <span class="form-hint" id="cx-gap-val">2</span>
+                        </div>
+                        <div class="form-group">
+                            <label>Espessura</label>
+                            <input type="range" id="cx-thick" min="1" max="8" value="2"
+                                oninput="renderPreview(); document.getElementById('cx-thick-val').textContent=this.value" />
+                            <span class="form-hint" id="cx-thick-val">2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeCrosshairModal()">Cancelar</button>
+                <button class="btn btn-primary" onclick="saveCrosshair()">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    Salvar Mira
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <div id="crosshair-detail-overlay" class="crosshair-detail-overlay" style="display:none"
+        onclick="closeCrosshairDetail(event)">
+        <div class="crosshair-detail-card" onclick="event.stopPropagation()">
+            <div class="crosshair-detail-header">
+                <div class="crosshair-detail-header-titles">
+                    <h3 id="cx-detail-name">—</h3>
+                    <div class="crosshair-detail-id" id="cx-detail-id">ID: —</div>
+                </div>
+                <div class="crosshair-detail-header-actions">
+                    <button class="favorite-btn" id="cx-detail-favorite-btn" type="button"
+                        style="display:none" title="Marcar como favorito">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z" />
+                        </svg>
+                    </button>
+                    <button class="crosshair-delete-btn" id="cx-detail-delete-btn" type="button"
+                        style="display:none" title="Remover crosshair">
+                        Remover
+                    </button>
+                    <button class="modal-close" onclick="closeCrosshairDetail()" aria-label="Fechar detalhes">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="crosshair-detail-body">
+                <canvas id="cx-detail-canvas" class="crosshair-detail-preview crosshair-preview-bg" width="240"
+                    height="240"></canvas>
+
+                <div class="crosshair-detail-info">
+                    <div class="crosshair-detail-meta">
+                        <span class="crosshair-badge" id="cx-detail-badge">—</span>
+                    </div>
+
+                    <div class="crosshair-detail-row">
+                        <span class="lbl">Descrição</span>
+                        <span class="val" id="cx-detail-desc">Sem descrição.</span>
+                    </div>
+
+                    <div class="crosshair-detail-row">
+                        <span class="lbl">Código de importação</span>
+                        <div class="crosshair-detail-code-row">
+                            <code id="cx-detail-code">—</code>
+                            <button class="copy-btn" id="cx-detail-copy-btn" title="Copiar código">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" />
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="crosshair-detail-footer">
+                <div class="crosshair-nav-group">
+                    <button class="crosshair-nav-btn" id="cx-detail-prev" onclick="goToAdjacentCrosshair(-1)"
+                        aria-label="Crosshair anterior">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="15 18 9 12 15 6" />
+                        </svg>
+                    </button>
+                    <button class="crosshair-nav-btn" id="cx-detail-next" onclick="goToAdjacentCrosshair(1)"
+                        aria-label="Próxima crosshair">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="crosshair-other-list" id="cx-detail-others"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.HENRIK_API_KEY = window.HENRIK_API_KEY || localStorage.getItem('HENRIK_API_KEY') || 'HDEV-2ef6b6ac-a346-425e-b3c2-de6d7dee8613';
+    </script>
+    <script src="scripts/tracker.js"></script>
+    <script src="scripts/crosshairs.js"></script>
+    <script src="scripts/lineups.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/app-nav.js"></script>
+    <script src="scripts/ui-sfx.js"></script>
+</body>
+
+</html>

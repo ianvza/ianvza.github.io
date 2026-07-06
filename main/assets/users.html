@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LinedUp — Usuários</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/home.css" />
+    <link rel="stylesheet" href="css/lineups.css" />
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="brand-link" data-route="home" aria-label="LinedUp Home">
+            <span class="brand-mark">LU</span>
+            <span>LinedUp</span>
+        </a>
+        <div class="navbar-links">
+            <a href="index.html" class="navbar-link" id="nav-home" data-route="home">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
+                    <path d="M9 21V12h6v9" />
+                </svg>
+                Home
+            </a>
+            <div class="navbar-auth">
+                <span class="session-user" id="session-user-label"></span>
+                <button class="auth-btn" id="auth-menu-btn" type="button" data-auth-action="login">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+                        <path d="M10 17l5-5-5-5" />
+                        <path d="M15 12H3" />
+                    </svg>
+                    Login
+                </button>
+                <button class="auth-btn" id="register-menu-btn" type="button" data-auth-action="register">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M19 8v6" />
+                        <path d="M22 11h-6" />
+                    </svg>
+                    Registrar
+                </button>
+            </div>
+            <a href="lineups.html" class="navbar-link" id="nav-lineups" data-route="lineups">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3" />
+                    <line x1="12" y1="2" x2="12" y2="6" />
+                    <line x1="12" y1="18" x2="12" y2="22" />
+                    <line x1="2" y1="12" x2="6" y2="12" />
+                    <line x1="18" y1="12" x2="22" y2="12" />
+                </svg>
+                Lineups
+            </a>
+            <a href="index.html#favorites" class="navbar-link" id="nav-favorites" data-route="favorites" data-auth-only>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11.5 4.2l2.1 4.4 4.8.7-3.5 3.4.8 4.8-4.2-2.3-4.2 2.3.8-4.8-3.5-3.4 4.8-.7 2.1-4.4z" />
+                </svg>
+                Favoritas
+            </a>
+            <a href="users.html" class="navbar-link active" id="nav-users" data-route="users" data-admin-only>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Usuários
+            </a>
+        </div>
+    </nav>
+
+    <main class="page">
+        <div class="home-container">
+            <section class="admin-page" id="users-admin-page">
+                <div class="crosshairs-header">
+                    <div>
+                        <div class="section-label">Admin</div>
+                        <h1 class="section-title">CRUD de Usuários</h1>
+                    </div>
+                </div>
+
+                <div class="card admin-create-card">
+                    <div class="section-label">Novo usuário</div>
+                    <form class="admin-user-form" id="admin-user-form">
+                        <input type="text" id="admin-login" placeholder="Login" autocomplete="off" />
+                        <input type="email" id="admin-email" placeholder="Email" autocomplete="off" />
+                        <input type="text" id="admin-senha" placeholder="Senha" autocomplete="off" />
+                        <select id="admin-type">
+                            <option value="normal">Normal</option>
+                            <option value="admin">Administrador</option>
+                        </select>
+                        <button class="btn btn-primary" type="submit">Adicionar</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="section-label">Usuários cadastrados</div>
+                    <div id="admin-users-content" class="admin-users-content"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-student">
+                <img src="img/profile/ian-souza-maciel.png" alt="Foto de perfil de Ian Souza Maciel"
+                    class="footer-avatar" loading="lazy" />
+                <div>
+                    <div class="footer-student-name">Ian Souza Maciel</div>
+                    <div class="footer-student-course">Engenharia de Software</div>
+                    <div class="footer-student-class">Turma <a
+                            href="https://pucminas.instructure.com/courses/260009" target="_blank"
+                            rel="noopener noreferrer">405102</a></div>
+                </div>
+            </div>
+
+            <div class="footer-bio">
+                <div class="footer-bio-label">Sobre</div>
+                <p class="footer-bio-text">
+                    Estudante de Engenharia de Software apaixonado por Valorant e por construir ferramentas
+                    para a comunidade do jogo. O LinedUp nasceu como projeto acadêmico para unir tracker de
+                    stats, lineups de utilitários e uma biblioteca de crosshairs em um só lugar.
+                </p>
+            </div>
+
+            <div class="footer-socials">
+                <a class="footer-social-link" href="https://instagram.com/iansmaciel" target="_blank"
+                    rel="noopener noreferrer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" />
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                        <line x1="17.5" y1="6.5" x2="17.5" y2="6.5" />
+                    </svg>
+                    @iansmaciel
+                </a>
+                <a class="footer-social-link" href="https://discord.com/users/fvmi" target="_blank"
+                    rel="noopener noreferrer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M20.3 5.3A17.4 17.4 0 0 0 16 4l-.2.5a13 13 0 0 1 3.7 1.9 14.9 14.9 0 0 0-11 0A13 13 0 0 1 12.2 4.5L12 4a17.4 17.4 0 0 0-4.3 1.3C5.7 8.6 5 12.2 5.3 15.7a14.4 14.4 0 0 0 4.4 2.3l.6-1a9.7 9.7 0 0 1-1.8-.9l.5-.4a12 12 0 0 0 10 0l.5.4a9.7 9.7 0 0 1-1.8.9l.6 1a14.4 14.4 0 0 0 4.4-2.3c.3-3.7-.5-7.3-2.4-10.4zM9.7 13.9c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5zm4.6 0c-.7 0-1.3-.7-1.3-1.5s.6-1.5 1.3-1.5 1.3.7 1.3 1.5-.6 1.5-1.3 1.5z" />
+                    </svg>
+                    @fvmi
+                </a>
+                <a class="footer-social-link" href="https://github.com/ianvza" target="_blank"
+                    rel="noopener noreferrer">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
+                    </svg>
+                    @ianvza
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            Projeto acadêmico — LinedUp © 2026. Todos os dados de crosshairs pertencem aos seus respectivos
+            criadores.
+        </div>
+    </footer>
+
+    <div id="toast-container"></div>
+
+    <script src="scripts/tracker.js"></script>
+    <script src="scripts/crosshairs.js"></script>
+    <script src="scripts/lineups.js"></script>
+    <script src="scripts/auth.js"></script>
+    <script src="scripts/app-nav.js"></script>
+    <script src="scripts/ui-sfx.js"></script>
+</body>
+
+</html>
