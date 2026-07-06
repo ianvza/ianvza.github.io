@@ -209,9 +209,11 @@ function renderLineupsAuthGate(app) {
     app.classList.add('lineups-auth-required');
     app.innerHTML = `
         <div class="lineups-login-gate">
-            <span class="lineups-kicker">Lineups</span>
-            <h1>Entre para acessar lineups</h1>
-            <p>Use uma conta para navegar pelos mapas, agentes, videos e marcacoes da ferramenta.</p>
+            <div class="lineups-login-panel">
+                <span class="lineups-kicker">Lineups</span>
+                <h1>Entre para acessar lineups</h1>
+                <p>Use uma conta para navegar pelos mapas, agentes, videos e marcacoes da ferramenta.</p>
+            </div>
             <div class="lineups-login-actions">
                 <button class="btn btn-primary" type="button" onclick="LinedUpAuth.openLogin()">
                     Login

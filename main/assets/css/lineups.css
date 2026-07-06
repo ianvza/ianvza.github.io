@@ -15,6 +15,97 @@
         var(--bg);
 }
 
+.lineups-auth-required {
+    position: relative;
+    min-height: calc(100vh - 58px);
+    display: grid;
+    place-items: center;
+    padding: 28px;
+    overflow: hidden;
+    background:
+        linear-gradient(90deg, rgba(9, 11, 16, 0.92), rgba(9, 11, 16, 0.42) 48%, rgba(9, 11, 16, 0.9)),
+        linear-gradient(180deg, rgba(9, 11, 16, 0.38), rgba(9, 11, 16, 0.9)),
+        url('../img/maps/ascent.png') center / cover no-repeat;
+}
+
+.lineups-auth-required::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
+    mask-image: linear-gradient(180deg, transparent, #000 18%, #000 78%, transparent);
+    opacity: 0.44;
+}
+
+.lineups-auth-required::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 46%, rgba(255, 70, 85, 0.16), transparent 32%);
+    pointer-events: none;
+}
+
+.lineups-login-gate {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 560px);
+    min-height: 360px;
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    gap: 22px;
+    padding: 44px 34px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: var(--radius);
+    background: rgba(17, 20, 27, 0.74);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.44);
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.lineups-login-panel {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+}
+
+.lineups-login-panel .lineups-kicker {
+    margin: 0;
+}
+
+.lineups-login-panel h1 {
+    max-width: 480px;
+    margin: 0;
+    color: #fff;
+    font-family: var(--font-title);
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    line-height: 0.98;
+    text-transform: uppercase;
+}
+
+.lineups-login-panel p {
+    max-width: 440px;
+    margin: 0;
+    color: rgba(245, 247, 252, 0.78);
+    font-size: 1rem;
+    line-height: 1.55;
+}
+
+.lineups-login-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.lineups-login-actions .btn {
+    min-width: 132px;
+}
+
 .lineups-sidebar {
     position: relative;
     background: rgba(26, 29, 37, 0.96);
@@ -765,6 +856,24 @@
 @media (max-width: 640px) {
     .lineups-page {
         padding-top: 58px;
+    }
+
+    .lineups-auth-required {
+        padding: 16px;
+    }
+
+    .lineups-login-gate {
+        min-height: 330px;
+        padding: 34px 22px;
+    }
+
+    .lineups-login-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .lineups-login-actions .btn {
+        width: 100%;
     }
 
     .lineups-board {
