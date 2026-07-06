@@ -38,8 +38,46 @@
             }
         });
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error || `Erro ${response.status}`);
+        if (!response.ok) {
+            const error = new Error(data.error || `Erro ${response.status}`);
+            error.status = response.status;
+            throw error;
+        }
         return data;
+    }
+
+    function isStaticHostApiError(error) {
+        return [404, 405, 501].includes(Number(error?.status));
+    }
+
+    async function loadStaticDb() {
+        const response = await fetch('../../db/db.json', { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Erro ${response.status}`);
+        return response.json();
+    }
+
+    function toPublicUser(user) {
+        if (!user) return null;
+        const { senha, verificationCodeHash, verificationToken, ...safeUser } = user;
+        return {
+            favoriteCrosshairIds: [],
+            ...safeUser
+        };
+    }
+
+    async function staticLogin(login, senha) {
+        const db = await loadStaticDb();
+        const credential = String(login || '').trim().toLowerCase();
+        const user = (db.users || []).find(item => {
+            const itemLogin = String(item.login || '').trim().toLowerCase();
+            const itemEmail = String(item.email || '').trim().toLowerCase();
+            return (itemLogin === credential || itemEmail === credential)
+                && String(item.senha || '') === String(senha || '');
+        });
+
+        if (!user) throw new Error('Login ou senha invalidos.');
+        if (user.emailVerified === false) throw new Error('Confirme seu email antes de entrar.');
+        return { user: toPublicUser(user), staticMode: true };
     }
 
     function ensureAuthModal() {
@@ -170,7 +208,16 @@
             showToast(`Login feito como ${data.user.login}.`);
             if (document.getElementById('users-admin-page')) initAdminUsersPage();
         } catch (error) {
-            showToast(error.message || 'Login invalido.');
+            try {
+                if (!isStaticHostApiError(error)) throw error;
+                const data = await staticLogin(login, senha);
+                setCurrentUser(data.user);
+                closeLogin();
+                showToast(`Login feito como ${data.user.login}.`);
+                if (document.getElementById('users-admin-page')) initAdminUsersPage();
+            } catch (fallbackError) {
+                showToast(fallbackError.message || error.message || 'Login invalido.');
+            }
         }
     }
 
@@ -199,6 +246,10 @@
             setAuthTab('verify');
             showToast(data.message || 'Digite o codigo enviado para seu email.', 6000);
         } catch (error) {
+            if (isStaticHostApiError(error)) {
+                showToast('Cadastro por email precisa do servidor Node ativo.');
+                return;
+            }
             showToast(error.message || 'Erro ao criar conta.');
         }
     }
@@ -328,24 +379,41 @@
         if (!content) return;
         try {
             const data = await apiRequest('/api/users');
-            content.innerHTML = data.users.map(user => `
-                <div class="admin-user-row" data-user-id="${user.id}">
-                    <input type="text" value="${escapeHtml(user.login)}" data-field="login" />
-                    <input type="email" value="${escapeHtml(user.email)}" data-field="email" />
-                    <input type="text" value="${escapeHtml(user.senha)}" data-field="senha" />
-                    <select data-field="type">
-                        <option value="normal"${user.type === 'normal' ? ' selected' : ''}>Normal</option>
-                        <option value="admin"${user.type === 'admin' ? ' selected' : ''}>Admin</option>
-                    </select>
-                    <div class="admin-actions">
-                        <button class="btn btn-ghost" type="button" onclick="LinedUpAuth.saveAdminUser(${user.id})">Salvar</button>
-                        <button class="btn btn-ghost" type="button" onclick="LinedUpAuth.deleteAdminUser(${user.id})">Excluir</button>
-                    </div>
-                </div>
-            `).join('');
+            content.innerHTML = renderAdminUserRows(data.users);
         } catch (error) {
-            content.innerHTML = `<div class="state-box"><p>${escapeHtml(error.message)}</p></div>`;
+            if (!isStaticHostApiError(error)) {
+                content.innerHTML = `<div class="state-box"><p>${escapeHtml(error.message)}</p></div>`;
+                return;
+            }
+
+            try {
+                const db = await loadStaticDb();
+                content.innerHTML = `
+                    <div class="state-box"><p>Modo GitHub Pages: usuarios carregados do db.json. Criar, salvar e excluir precisam do servidor Node.</p></div>
+                    ${renderAdminUserRows(db.users || [])}
+                `;
+            } catch (fallbackError) {
+                content.innerHTML = `<div class="state-box"><p>${escapeHtml(fallbackError.message)}</p></div>`;
+            }
         }
+    }
+
+    function renderAdminUserRows(users) {
+        return users.map(user => `
+            <div class="admin-user-row" data-user-id="${user.id}">
+                <input type="text" value="${escapeHtml(user.login)}" data-field="login" />
+                <input type="email" value="${escapeHtml(user.email)}" data-field="email" />
+                <input type="text" value="${escapeHtml(user.senha || '')}" data-field="senha" />
+                <select data-field="type">
+                    <option value="normal"${user.type === 'normal' ? ' selected' : ''}>Normal</option>
+                    <option value="admin"${user.type === 'admin' ? ' selected' : ''}>Admin</option>
+                </select>
+                <div class="admin-actions">
+                    <button class="btn btn-ghost" type="button" onclick="LinedUpAuth.saveAdminUser(${user.id})">Salvar</button>
+                    <button class="btn btn-ghost" type="button" onclick="LinedUpAuth.deleteAdminUser(${user.id})">Excluir</button>
+                </div>
+            </div>
+        `).join('');
     }
 
     async function createAdminUser(event) {
