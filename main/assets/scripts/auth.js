@@ -27,9 +27,18 @@
         return false;
     }
 
+    function getApiBase() {
+        return String(window.LINEDUP_API_BASE || localStorage.getItem('LINEDUP_API_BASE') || '').trim().replace(/\/+$/, '');
+    }
+
+    function apiUrl(url) {
+        const base = getApiBase();
+        return base && String(url).startsWith('/api/') ? `${base}${url}` : url;
+    }
+
     async function apiRequest(url, options = {}) {
         const user = getCurrentUser();
-        const response = await fetch(url, {
+        const response = await fetch(apiUrl(url), {
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -47,7 +56,7 @@
     }
 
     function isStaticHostApiError(error) {
-        return [404, 405, 501].includes(Number(error?.status));
+        return !getApiBase() && [404, 405, 501].includes(Number(error?.status));
     }
 
     async function loadStaticDb() {

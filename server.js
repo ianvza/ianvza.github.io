@@ -30,6 +30,24 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+function setCorsHeaders(req, res) {
+  const allowedOrigins = String(process.env.CORS_ORIGIN || 'https://ianvza.github.io,http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:3003')
+    .split(',')
+    .map(origin => origin.trim())
+    .filter(Boolean);
+  const origin = req.headers.origin;
+
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  } else if (!origin) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+
+  res.setHeader('Vary', 'Origin');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type,X-LinedUp-User-Id');
+}
+
 function sendJson(res, status, payload) {
   const body = JSON.stringify(payload);
   res.writeHead(status, {
@@ -457,6 +475,13 @@ async function serveStatic(req, res, url) {
 
 async function route(req, res) {
   const url = new URL(req.url, `http://${req.headers.host || `localhost:${PORT}`}`);
+  setCorsHeaders(req, res);
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
 
   try {
     if (url.pathname.startsWith('/api/auth/') && await handleAuth(req, res, url) !== false) return;
