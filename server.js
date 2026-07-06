@@ -1,23 +1,12 @@
-const crypto = require('crypto');
 const fs = require('fs/promises');
 const http = require('http');
 const https = require('https');
 const path = require('path');
-let nodemailer = null;
-
-try {
-  nodemailer = require('nodemailer');
-} catch {
-  nodemailer = null;
-}
 
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = __dirname;
 const PUBLIC_DIR = path.join(ROOT, 'main', 'assets');
 const DB_PATH = path.join(ROOT, 'db', 'db.json');
-const VERIFICATION_CODE_TTL_MS = 1000 * 60 * 10;
-const VERIFICATION_RESEND_COOLDOWN_MS = 1000 * 60;
-const VERIFICATION_MAX_ATTEMPTS = 5;
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -92,7 +81,7 @@ async function readBody(req) {
 
 function publicUser(user) {
   if (!user) return null;
-  const { senha, verificationCodeHash, verificationToken, ...safeUser } = user;
+  const { senha, ...safeUser } = user;
   return {
     favoriteCrosshairIds: [],
     ...safeUser
@@ -103,8 +92,7 @@ function adminUser(user) {
   if (!user) return null;
   return {
     favoriteCrosshairIds: [],
-    ...user,
-    verificationToken: undefined
+    ...user
   };
 }
 
@@ -125,84 +113,8 @@ function isAdmin(req, db) {
   return user?.type === 'admin';
 }
 
-function generateVerificationCode() {
-  return String(crypto.randomInt(0, 1000000)).padStart(6, '0');
-}
-
-function hashVerificationCode(code) {
-  return crypto.createHash('sha256').update(String(code)).digest('hex');
-}
-
-function getMailConfig() {
-  const gmailUser = process.env.GMAIL_USER || process.env.SMTP_USER;
-  const gmailPass = process.env.GMAIL_APP_PASSWORD || process.env.SMTP_PASS;
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
-  const port = Number(process.env.SMTP_PORT || 465);
-
-  if (!gmailUser || !gmailPass) return null;
-
-  return {
-    host,
-    port,
-    secure: port === 465,
-    auth: {
-      user: gmailUser,
-      pass: gmailPass
-    }
-  };
-}
-
-async function sendVerificationEmail(pendingUser, code) {
-  const mailConfig = getMailConfig();
-  const from = process.env.SMTP_FROM || process.env.GMAIL_USER || process.env.SMTP_USER || 'LinedUp';
-  const subject = 'Codigo de verificacao do LinedUp';
-  const text = [
-    `Seu codigo de verificacao do LinedUp e: ${code}`,
-    '',
-    'Ele expira em 10 minutos.',
-    'Se voce nao tentou criar uma conta, ignore este email.'
-  ].join('\n');
-  const html = `
-    <div style="font-family:Arial,sans-serif;line-height:1.5;color:#111">
-      <h2>Confirme seu email no LinedUp</h2>
-      <p>Use o codigo abaixo para ativar sua conta:</p>
-      <p style="font-size:28px;font-weight:700;letter-spacing:6px">${code}</p>
-      <p>Este codigo expira em 10 minutos.</p>
-      <p>Se voce nao tentou criar uma conta, ignore este email.</p>
-    </div>
-  `;
-
-  if (nodemailer && mailConfig) {
-    const transporter = nodemailer.createTransport(mailConfig);
-    await transporter.sendMail({
-      from,
-      to: pendingUser.email,
-      subject,
-      text,
-      html
-    });
-  }
-
-  console.log('\n[LinedUp] Codigo de confirmacao de email');
-  console.log(`Para: ${pendingUser.email}`);
-  console.log(`Codigo: ${code}`);
-  console.log(nodemailer && mailConfig ? 'Status: enviado por SMTP\n' : 'Status: SMTP nao configurado; use este codigo em desenvolvimento\n');
-
-  return Boolean(nodemailer && mailConfig);
-}
-
-function cleanupExpiredPendingUsers(db) {
-  const now = Date.now();
-  db.pendingUsers = db.pendingUsers.filter(user => {
-    const expiresAt = Date.parse(user.expiresAt || '');
-    return Number.isFinite(expiresAt) && expiresAt > now;
-  });
-}
-
 async function handleAuth(req, res, url) {
   const db = await readDb();
-  cleanupExpiredPendingUsers(db);
-  let dbChanged = false;
 
   if (req.method === 'POST' && url.pathname === '/api/auth/login') {
     const { login, senha } = await readBody(req);
@@ -213,9 +125,6 @@ async function handleAuth(req, res, url) {
     );
 
     if (!user) return sendJson(res, 401, { error: 'Login ou senha invalidos.' });
-    if (user.emailVerified === false) {
-      return sendJson(res, 403, { error: 'Confirme seu email antes de entrar.' });
-    }
 
     return sendJson(res, 200, { user: publicUser(user) });
   }
@@ -230,118 +139,27 @@ async function handleAuth(req, res, url) {
       return sendJson(res, 400, { error: 'Preencha login, email e senha.' });
     }
 
-    const loginTaken = db.users.some(user => normalizeCredential(user.login) === normalizeCredential(cleanLogin))
-      || db.pendingUsers.some(user => normalizeCredential(user.login) === normalizeCredential(cleanLogin));
-    const emailTaken = db.users.some(user => normalizeCredential(user.email) === cleanEmail)
-      || db.pendingUsers.some(user => normalizeCredential(user.email) === cleanEmail);
+    const loginTaken = db.users.some(user => normalizeCredential(user.login) === normalizeCredential(cleanLogin));
+    const emailTaken = db.users.some(user => normalizeCredential(user.email) === cleanEmail);
 
     if (loginTaken) return sendJson(res, 409, { error: 'Este login ja esta em uso.' });
-    if (emailTaken) return sendJson(res, 409, { error: 'Este email ja esta em uso ou aguardando confirmacao.' });
+    if (emailTaken) return sendJson(res, 409, { error: 'Este email ja esta em uso.' });
 
-    const code = generateVerificationCode();
-    const now = Date.now();
-    const pendingUser = {
-      id: crypto.randomUUID(),
+    const user = {
+      id: nextNumericId(db.users),
       login: cleanLogin,
       email: cleanEmail,
       senha: cleanPassword,
       type: 'normal',
       favoriteCrosshairIds: [],
-      verificationCodeHash: hashVerificationCode(code),
-      verificationAttempts: 0,
-      verificationSentAt: new Date(now).toISOString(),
-      createdAt: new Date(now).toISOString(),
-      expiresAt: new Date(now + VERIFICATION_CODE_TTL_MS).toISOString()
-    };
-
-    db.pendingUsers.push(pendingUser);
-    await writeDb(db);
-    const emailSent = await sendVerificationEmail(pendingUser, code);
-
-    return sendJson(res, 202, {
-      email: pendingUser.email,
-      expiresInSeconds: Math.floor(VERIFICATION_CODE_TTL_MS / 1000),
-      resendAfterSeconds: Math.floor(VERIFICATION_RESEND_COOLDOWN_MS / 1000),
-      message: emailSent
-        ? 'Enviamos um codigo de verificacao para seu email.'
-        : 'Codigo gerado. SMTP nao configurado, confira o terminal do servidor.'
-    });
-  }
-
-  if (req.method === 'POST' && url.pathname === '/api/auth/verify-code') {
-    const { email, code } = await readBody(req);
-    const cleanEmail = String(email || '').trim().toLowerCase();
-    const cleanCode = String(code || '').trim();
-    const pendingUser = db.pendingUsers.find(user => normalizeCredential(user.email) === cleanEmail);
-
-    if (!pendingUser) return sendJson(res, 404, { error: 'Cadastro pendente nao encontrado.' });
-
-    const expiresAt = Date.parse(pendingUser.expiresAt || '');
-    if (!Number.isFinite(expiresAt) || expiresAt <= Date.now()) {
-      db.pendingUsers = db.pendingUsers.filter(item => item.id !== pendingUser.id);
-      await writeDb(db);
-      return sendJson(res, 410, { error: 'Codigo expirado. Faca o cadastro novamente.' });
-    }
-
-    if ((Number(pendingUser.verificationAttempts) || 0) >= VERIFICATION_MAX_ATTEMPTS) {
-      return sendJson(res, 429, { error: 'Muitas tentativas. Reenvie o codigo para tentar novamente.' });
-    }
-
-    if (!/^\d{6}$/.test(cleanCode) || pendingUser.verificationCodeHash !== hashVerificationCode(cleanCode)) {
-      pendingUser.verificationAttempts = (Number(pendingUser.verificationAttempts) || 0) + 1;
-      await writeDb(db);
-      const remainingAttempts = Math.max(0, VERIFICATION_MAX_ATTEMPTS - pendingUser.verificationAttempts);
-      return sendJson(res, 400, { error: `Codigo invalido. Tentativas restantes: ${remainingAttempts}.` });
-    }
-
-    const user = {
-      id: nextNumericId(db.users),
-      login: pendingUser.login,
-      email: pendingUser.email,
-      senha: pendingUser.senha,
-      type: pendingUser.type || 'normal',
-      favoriteCrosshairIds: pendingUser.favoriteCrosshairIds || [],
-      emailVerified: true,
       createdAt: new Date().toISOString()
     };
 
     db.users.push(user);
-    db.pendingUsers = db.pendingUsers.filter(item => item.id !== pendingUser.id);
     await writeDb(db);
-    return sendJson(res, 201, { user: publicUser(user), message: 'Email confirmado. Conta criada com sucesso.' });
+    return sendJson(res, 201, { user: publicUser(user) });
   }
 
-  if (req.method === 'POST' && url.pathname === '/api/auth/resend-code') {
-    const { email } = await readBody(req);
-    const cleanEmail = String(email || '').trim().toLowerCase();
-    const pendingUser = db.pendingUsers.find(user => normalizeCredential(user.email) === cleanEmail);
-
-    if (!pendingUser) return sendJson(res, 404, { error: 'Cadastro pendente nao encontrado.' });
-
-    const sentAt = Date.parse(pendingUser.verificationSentAt || pendingUser.createdAt || '');
-    const elapsed = Number.isFinite(sentAt) ? Date.now() - sentAt : VERIFICATION_RESEND_COOLDOWN_MS;
-    if (elapsed < VERIFICATION_RESEND_COOLDOWN_MS) {
-      const wait = Math.ceil((VERIFICATION_RESEND_COOLDOWN_MS - elapsed) / 1000);
-      return sendJson(res, 429, { error: `Aguarde ${wait}s para reenviar o codigo.`, resendAfterSeconds: wait });
-    }
-
-    const code = generateVerificationCode();
-    const now = Date.now();
-    pendingUser.verificationCodeHash = hashVerificationCode(code);
-    pendingUser.verificationAttempts = 0;
-    pendingUser.verificationSentAt = new Date(now).toISOString();
-    pendingUser.expiresAt = new Date(now + VERIFICATION_CODE_TTL_MS).toISOString();
-    await writeDb(db);
-
-    const emailSent = await sendVerificationEmail(pendingUser, code);
-    return sendJson(res, 200, {
-      expiresInSeconds: Math.floor(VERIFICATION_CODE_TTL_MS / 1000),
-      resendAfterSeconds: Math.floor(VERIFICATION_RESEND_COOLDOWN_MS / 1000),
-      message: emailSent ? 'Codigo reenviado para seu email.' : 'Novo codigo gerado. Confira o terminal do servidor.'
-    });
-  }
-
-  if (dbChanged) await writeDb(db);
   return false;
 }
 
@@ -366,7 +184,6 @@ async function handleUsers(req, res, url) {
       senha: String(payload.senha).trim(),
       type: payload.type === 'admin' ? 'admin' : 'normal',
       favoriteCrosshairIds: [],
-      emailVerified: true,
       createdAt: new Date().toISOString()
     };
     db.users.push(user);
@@ -384,7 +201,6 @@ async function handleUsers(req, res, url) {
     if (payload.email !== undefined) user.email = String(payload.email).trim().toLowerCase();
     if (payload.senha !== undefined) user.senha = String(payload.senha).trim();
     if (payload.type !== undefined) user.type = payload.type === 'admin' ? 'admin' : 'normal';
-    if (payload.emailVerified !== undefined) user.emailVerified = Boolean(payload.emailVerified);
 
     await writeDb(db);
     return sendJson(res, 200, { user: publicUser(user) });
@@ -683,6 +499,4 @@ async function route(req, res) {
 
 http.createServer(route).listen(PORT, () => {
   console.log(`LinedUp rodando em http://localhost:${PORT}`);
-  console.log('Codigos de confirmacao aparecem aqui quando SMTP nao estiver configurado.');
-  console.log('Gmail SMTP: configure GMAIL_USER e GMAIL_APP_PASSWORD antes de iniciar o servidor.');
 });

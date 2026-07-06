@@ -668,3 +668,36 @@ select option {
     color: var(--red);
     font-size: 0.68rem;
 }
+
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 44px;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 8px;
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
+    border: 0;
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text-3);
+    cursor: pointer;
+    transition: color var(--transition), background var(--transition);
+}
+
+.password-toggle:hover,
+.password-toggle:focus-visible {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    outline: none;
+}

@@ -2,7 +2,6 @@
 
 (function () {
     const sessionKey = 'linedup_user';
-    let pendingVerificationEmail = '';
 
     function getCurrentUser() {
         try {
@@ -67,7 +66,7 @@
 
     function toPublicUser(user) {
         if (!user) return null;
-        const { senha, verificationCodeHash, verificationToken, ...safeUser } = user;
+        const { senha, ...safeUser } = user;
         return {
             favoriteCrosshairIds: [],
             ...safeUser
@@ -85,8 +84,29 @@
         });
 
         if (!user) throw new Error('Login ou senha invalidos.');
-        if (user.emailVerified === false) throw new Error('Confirme seu email antes de entrar.');
         return { user: toPublicUser(user), staticMode: true };
+    }
+
+    function passwordField(inputId, autocomplete, placeholder) {
+        return `
+            <div class="password-field">
+                <input type="password" id="${inputId}" autocomplete="${autocomplete}" placeholder="${placeholder}" />
+                <button class="password-toggle" type="button" data-password-target="${inputId}" aria-label="Mostrar senha">
+                    <svg class="password-eye" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <svg class="password-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden>
+                        <path d="M3 3l18 18" />
+                        <path d="M10.6 10.6a3 3 0 0 0 4.2 4.2" />
+                        <path d="M9.9 4.2A10.8 10.8 0 0 1 12 4c6.5 0 10 8 10 8a18.7 18.7 0 0 1-3.2 4.4" />
+                        <path d="M6.1 6.1C3.5 7.9 2 12 2 12s3.5 8 10 8a10.6 10.6 0 0 0 5.2-1.3" />
+                    </svg>
+                </button>
+            </div>
+        `;
     }
 
     function ensureAuthModal() {
@@ -135,7 +155,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Senha</label>
-                                <input type="password" id="login-password" autocomplete="current-password" placeholder="Digite sua senha" />
+                                ${passwordField('login-password', 'current-password', 'Digite sua senha')}
                             </div>
                             <button class="btn btn-primary" type="submit">Entrar</button>
                         </form>
@@ -153,22 +173,14 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Senha</label>
-                                    <input type="password" id="register-password" autocomplete="new-password" placeholder="Crie uma senha" />
+                                    ${passwordField('register-password', 'new-password', 'Crie uma senha')}
                                 </div>
                                 <div class="form-group">
                                     <label>Confirmar senha</label>
-                                    <input type="password" id="register-password-2" autocomplete="new-password" placeholder="Repita a senha" />
+                                    ${passwordField('register-password-2', 'new-password', 'Repita a senha')}
                                 </div>
                             </div>
                             <button class="btn btn-primary" type="submit">Criar conta</button>
-                        </form>
-                        <form class="auth-panel" id="verify-form" hidden>
-                            <div class="form-group">
-                                <label>Codigo de verificacao</label>
-                                <input type="text" id="verify-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" />
-                            </div>
-                            <button class="btn btn-primary" type="submit">Confirmar email</button>
-                            <button class="btn btn-ghost" id="resend-code-btn" type="button">Reenviar codigo</button>
                         </form>
                     </div>
                 </div>
@@ -182,7 +194,6 @@
         });
         document.getElementById('login-form')?.toggleAttribute('hidden', tab !== 'login');
         document.getElementById('register-form')?.toggleAttribute('hidden', tab !== 'register');
-        document.getElementById('verify-form')?.toggleAttribute('hidden', tab !== 'verify');
     }
 
     function openLogin(tab = 'login') {
@@ -250,57 +261,16 @@
                 method: 'POST',
                 body: JSON.stringify({ login, email, senha })
             });
-            pendingVerificationEmail = data.email || email;
             document.getElementById('register-form')?.reset();
-            setAuthTab('verify');
-            showToast(data.message || 'Digite o codigo enviado para seu email.', 6000);
+            setCurrentUser(data.user);
+            closeLogin();
+            showToast('Conta criada e login realizado.');
         } catch (error) {
             if (isStaticHostApiError(error)) {
-                showToast('Cadastro por email precisa do servidor Node ativo.');
+                showToast('Cadastro precisa do servidor Node ativo.');
                 return;
             }
             showToast(error.message || 'Erro ao criar conta.');
-        }
-    }
-
-    async function processVerification(event) {
-        event.preventDefault();
-        const code = document.getElementById('verify-code')?.value.trim();
-        if (!pendingVerificationEmail || !code) {
-            showToast('Informe o codigo recebido por email.');
-            return;
-        }
-
-        try {
-            const data = await apiRequest('/api/auth/verify-code', {
-                method: 'POST',
-                body: JSON.stringify({ email: pendingVerificationEmail, code })
-            });
-            pendingVerificationEmail = '';
-            document.getElementById('verify-form')?.reset();
-            setCurrentUser(data.user);
-            closeLogin();
-            showToast(data.message || `Login feito como ${data.user.login}.`);
-        } catch (error) {
-            showToast(error.message || 'Erro ao confirmar email.');
-        }
-    }
-
-    async function resendVerificationCode() {
-        if (!pendingVerificationEmail) {
-            showToast('Faca o cadastro novamente para reenviar o codigo.');
-            setAuthTab('register');
-            return;
-        }
-
-        try {
-            const data = await apiRequest('/api/auth/resend-code', {
-                method: 'POST',
-                body: JSON.stringify({ email: pendingVerificationEmail })
-            });
-            showToast(data.message || 'Codigo reenviado.');
-        } catch (error) {
-            showToast(error.message || 'Erro ao reenviar codigo.');
         }
     }
 
@@ -472,10 +442,12 @@
     function initAuthUi() {
         ensureAuthModal();
         syncAuthChrome();
-        showVerificationToast();
 
         document.querySelectorAll('.auth-tab').forEach(button => {
             button.onclick = () => setAuthTab(button.dataset.authTab || 'login');
+        });
+        document.querySelectorAll('.password-toggle').forEach(button => {
+            button.onclick = () => togglePasswordVisibility(button);
         });
         const loginForm = document.getElementById('login-form');
         if (loginForm && loginForm.dataset.bound !== 'true') {
@@ -486,16 +458,6 @@
         if (registerForm && registerForm.dataset.bound !== 'true') {
             registerForm.dataset.bound = 'true';
             registerForm.addEventListener('submit', processRegister);
-        }
-        const verifyForm = document.getElementById('verify-form');
-        if (verifyForm && verifyForm.dataset.bound !== 'true') {
-            verifyForm.dataset.bound = 'true';
-            verifyForm.addEventListener('submit', processVerification);
-        }
-        const resendButton = document.getElementById('resend-code-btn');
-        if (resendButton && resendButton.dataset.bound !== 'true') {
-            resendButton.dataset.bound = 'true';
-            resendButton.addEventListener('click', resendVerificationCode);
         }
         const menuButton = document.getElementById('auth-menu-btn');
         if (menuButton && menuButton.dataset.bound !== 'true') {
@@ -514,21 +476,14 @@
         initAdminUsersPage();
     }
 
-    function showVerificationToast() {
-        const params = new URLSearchParams(location.search);
-        const verified = params.get('verified');
-        if (!verified || sessionStorage.getItem('linedup_verification_toast') === verified) return;
-
-        sessionStorage.setItem('linedup_verification_toast', verified);
-        if (verified === '1') {
-            showToast('Email confirmado. Agora voce ja pode entrar.');
-        } else if (verified === 'invalid') {
-            showToast('Link de confirmacao invalido ou expirado.');
-        }
-
-        params.delete('verified');
-        const query = params.toString();
-        history.replaceState(history.state, '', `${location.pathname}${query ? `?${query}` : ''}${location.hash}`);
+    function togglePasswordVisibility(button) {
+        const input = document.getElementById(button.dataset.passwordTarget);
+        if (!input) return;
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        button.setAttribute('aria-label', showing ? 'Mostrar senha' : 'Esconder senha');
+        button.querySelector('.password-eye')?.toggleAttribute('hidden', !showing);
+        button.querySelector('.password-eye-off')?.toggleAttribute('hidden', showing);
     }
 
     window.LinedUpAuth = {
